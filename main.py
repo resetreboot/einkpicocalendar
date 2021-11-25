@@ -29,6 +29,8 @@ WEEKDAYS = [
 
 MARK_WEEKENDS = False
 
+TICKS_MS = 36000
+
 # Display resolution
 EPD_WIDTH       = 400
 EPD_HEIGHT      = 300
@@ -52,6 +54,7 @@ def writetext(fb, font, posx, posy, text, invert=False, format=framebuf.MONO_HMS
 
 def draw_calendar_outline(fb, posx, posy, width, height, color):
     fb.rect(posx, posy, width, height, color)
+    fb.rect(posx - 1, posy - 1, width + 2, height + 2, color)
     colincr = width // 7
     for col in range(1, 7):
         fb.vline(posx + (col * colincr), posy, height, color)
@@ -59,6 +62,8 @@ def draw_calendar_outline(fb, posx, posy, width, height, color):
     lineincr = height // 7
     for line in range(1, 7):
         fb.hline(posx, posy + (line * lineincr), width, color)
+
+    fb.hline(posx, posy + 1 + lineincr, width, color)
 
 
 def draw_black_day(fb, posx, posy, width, height, day, week):
@@ -164,7 +169,7 @@ if __name__ == '__main__':
         reading = sensor_temp.read_u16() * CONVERSION_FACTOR
         temperatura = 27 - (reading - 0.706)/0.001721
 
-        if first_loop or changed or utime.ticks_diff(utime.ticks_ms(), now) > 12000:
+        if first_loop or changed or utime.ticks_diff(utime.ticks_ms(), now) > TICKS_MS:
             clean = changed or first_loop
             first_loop = False
             fb.fill(0xff)
@@ -183,8 +188,8 @@ if __name__ == '__main__':
             draw_calendar_outline(fb, CALX, CALY + 35, CALENDAR_WIDTH, CALENDAR_HEIGHT, 0)
 
             print("Writing chevrons")
-            writetext(fb, texgyread, 2, 185, "<")
-            writetext(fb, texgyread, 2, 265, ">")
+            writetext(fb, texgyread, 2, 175, "<")
+            writetext(fb, texgyread, 2, 260, ">")
 
             days = 0
             week = 1
